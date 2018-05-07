@@ -1204,8 +1204,8 @@ class global_navigation extends navigation_node {
         if (get_home_page() == HOMEPAGE_SITE) {
             // The home element should be my moodle because the root element is the site
             if (isloggedin() && !isguestuser()) {  // Makes no sense if you aren't logged in
-                $this->rootnodes['home'] = $this->add(get_string('myhome'), new moodle_url('/my/'), self::TYPE_SETTING, null, 'home');
-                $this->rootnodes['home']->showinflatnavigation = true;
+                $this->rootnodes['myhome'] = $this->add(get_string('myhome'), new moodle_url('/my/'), self::TYPE_SETTING, null, 'myhome');
+                $this->rootnodes['myhome']->showinflatnavigation = true;
             }
         } else {
             // The home element should be the site because the root node is my moodle
@@ -1411,7 +1411,7 @@ class global_navigation extends navigation_node {
         foreach ($this->rootnodes as $node) {
             // Dont remove the home node
             /** @var navigation_node $node */
-            if ($node->key !== 'home' && !$node->has_children() && !$node->isactive) {
+            if (!in_array($node->key, ['home', 'myhome']) && !$node->has_children() && !$node->isactive) {
                 $node->remove();
             }
         }
