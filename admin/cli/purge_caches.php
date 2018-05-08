@@ -28,7 +28,19 @@ define('CLI_SCRIPT', true);
 require(__DIR__.'/../../config.php');
 require_once($CFG->libdir.'/clilib.php');
 
-list($options, $unrecognized) = cli_get_params(array('help' => false), array('h' => 'help'));
+// Define the input options.
+$longparams = array(
+    'help' => false,
+    'themesonly' => false
+);
+
+$shortparams = array(
+    'h' => 'help',
+    't' => 'themesonly'
+);
+
+// now get cli options
+list($options, $unrecognized) = cli_get_params($longparams, $shortparams);
 
 if ($unrecognized) {
     $unrecognized = implode("\n  ", $unrecognized);
@@ -37,18 +49,30 @@ if ($unrecognized) {
 
 if ($options['help']) {
     $help =
-"Invalidates all Moodle internal caches
+"Invalidates Moodle internal caches
 
 Options:
 -h, --help            Print out this help
+-t, --themesonly      purge only the cache themes
 
 Example:
 \$sudo -u www-data /usr/bin/php admin/cli/purge_caches.php
+\$sudo -u www-data /usr/bin/php admin/cli/purge_caches.php --themesonly
 ";
 
     echo $help;
     exit(0);
 }
+
+if ($options['themesonly']) {
+    echo "Purging only the theme caches\n";
+
+    theme_reset_all_caches();
+
+    exit(0);
+}
+
+echo "Purging all Moodle caches\n";
 
 purge_all_caches();
 
