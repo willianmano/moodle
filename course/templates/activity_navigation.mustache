@@ -68,7 +68,7 @@
 {{< core/columns-1to1to1}}
     {{$column1}}
         <div class="pull-left">
-            {{#prevlink}}{{> core/action_link }}{{/prevlink}}
+            {{#prevlink}}{{#pix}} e/right_to_left, core {{/pix}}{{> core/action_link }}{{/prevlink}}
         </div>
     {{/column1}}
     {{$column2}}
@@ -78,7 +78,7 @@
     {{/column2}}
     {{$column3}}
         <div class="pull-right">
-            {{#nextlink}}{{> core/action_link }}{{/nextlink}}
+            {{#nextlink}}{{> core/action_link }}{{#pix}} e/left_to_right, core {{/pix}}{{/nextlink}}
         </div>
     {{/column3}}
 {{/ core/columns-1to1to1}}

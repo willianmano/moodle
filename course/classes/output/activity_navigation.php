@@ -76,7 +76,7 @@ class activity_navigation implements renderable, templatable {
                 'id' => 'prev-activity-link',
                 'title' => $linkname,
             ];
-            $this->prevlink = new \action_link($linkurl, $OUTPUT->larrow() . ' ' . $linkname, null, $attributes);
+            $this->prevlink = new \action_link($linkurl, $linkname, null, $attributes);
         }
 
         // Check if there is a next module to display.
@@ -92,7 +92,7 @@ class activity_navigation implements renderable, templatable {
                 'id' => 'next-activity-link',
                 'title' => $linkname,
             ];
-            $this->nextlink = new \action_link($linkurl, $linkname . ' ' . $OUTPUT->rarrow(), null, $attributes);
+            $this->nextlink = new \action_link($linkurl, $linkname, null, $attributes);
         }
 
         // Render the activity list dropdown menu if available.
