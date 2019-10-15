@@ -2003,6 +2003,14 @@ abstract class enrol_plugin {
                     $ue->status, $ue->timestart, $ue->timeend);
         }
 
+        // Display a notification message after the user enrollment.
+        if ($USER->id == $userid) {
+            \core\notification::success(get_string('youenrolledincourse', 'enrol'));
+        } else {
+            $addeduser = $DB->get_record('user', ['id' => $userid], '*', MUST_EXIST);
+            \core\notification::success(get_string('userenrolledincourse', 'enrol', fullname($addeduser)));
+        }
+
         if ($roleid) {
             // this must be done after the enrolment event so that the role_assigned event is triggered afterwards
             if ($this->roles_protected()) {
@@ -2175,6 +2183,14 @@ abstract class enrol_plugin {
                     )
                 );
         $event->trigger();
+
+        // Display a notification message after the user unenrollment.
+        if ($USER->id == $userid) {
+            \core\notification::success(get_string('youunenrolledfromcourse', 'enrol'));
+        } else {
+            $removeduser = $DB->get_record('user', ['id' => $userid], '*', MUST_EXIST);
+            \core\notification::success(get_string('userunenrolledfromcourse', 'enrol', fullname($removeduser)));
+        }
 
         // User enrolments have changed, so mark user as dirty.
         mark_user_dirty($userid);

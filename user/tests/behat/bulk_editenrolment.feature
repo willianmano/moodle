@@ -43,9 +43,10 @@ Feature: Bulk enrolments
     And I click on "Select all" "checkbox"
     And I set the field "With selected users..." to "Delete selected user enrolments"
     And I press "Unenrol users"
-    Then I should not see "Student 1"
-    And I should not see "Student 2"
-    And I should not see "Teacher 1"
+    Then I should see "User \"Student 1\" was unenrolled from the course."
+    And I should see "User \"Student 2\" was unenrolled from the course."
+    And I should see "User \"Teacher 1\" was unenrolled from the course."
+    And I should see "Nothing to display"
 
   @javascript
   Scenario: Bulk edit enrolment for deleted user

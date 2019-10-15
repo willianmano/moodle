@@ -154,11 +154,19 @@ switch ($action) {
         }
         $plugin = $plugins[$instance->enrol];
         if ($plugin->allow_enrol($instance) && has_capability('enrol/'.$plugin->get_name().':enrol', $context)) {
+            $counter = 0;
             foreach ($users as $user) {
                 $plugin->enrol_user($instance, $user->id, $roleid, $timestart, $timeend, null, $recovergrades);
+                $counter++;
             }
             foreach ($cohorts as $cohort) {
                 $plugin->enrol_cohort($instance, $cohort->id, $roleid, $timestart, $timeend, null, $recovergrades);
+                $counter++;
+            }
+
+            // Display a notification message after the bulk user enrollment.
+            if ($counter > 1) {
+                \core\notification::info(get_string('totalenrolledusers', 'enrol', $counter));
             }
         } else {
             throw new enrol_ajax_exception('enrolnotpermitted');
