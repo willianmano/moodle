@@ -541,6 +541,49 @@ function mod_book_get_tagged_chapters($tag, $exclusivemode = false, $fromctx = 0
 }
 
 /**
+ * Returns the ID of the last visited page
+ *
+ * @param int $courseid
+ * @param int $contextinstanceid
+ *
+ * @return bool
+ *
+ * @throws dml_exception
+ */
+function mod_book_get_user_last_viewed_chapter($courseid, $contextinstanceid) {
+    global $DB, $USER;
+
+    $parameters = [
+        'component' => 'mod_book',
+        'action' => 'viewed',
+        'target' => 'chapter',
+        'objecttable' => 'book_chapters',
+        'contextinstanceid' => $contextinstanceid,
+        'courseid' => $courseid,
+        'userid' => $USER->id
+    ];
+
+    $sql = "SELECT objectid
+            FROM {logstore_standard_log}
+            WHERE component = :component
+                AND action = :action
+                AND target = :target
+                AND objecttable = :objecttable
+                AND contextinstanceid = :contextinstanceid
+                AND courseid = :courseid
+                AND userid = :userid
+            ORDER BY timecreated desc";
+
+    $record = $DB->get_record_sql($sql, $parameters, IGNORE_MULTIPLE);
+
+    if ($record) {
+        return $record->objectid;
+    }
+
+    return false;
+}
+
+/**
  * File browsing support class
  *
  * @copyright  2010-2011 Petr Skoda {@link http://skodak.org}
