@@ -89,6 +89,17 @@ if ($chapterid == '0') { // Go to first chapter if no given.
             break;
         }
     }
+
+    // If a page was not set, them set the last visited page to display if it exists and is not hidden.
+    $lastuserviewedchapter = mod_book_get_user_last_viewed_chapter($book->course, $cm->id);
+
+    if (!$edit && $lastuserviewedchapter != false) {
+        $lastchapter = isset($chapters[$lastuserviewedchapter]) ? $chapters[$lastuserviewedchapter] : false;
+
+        if (!$lastchapter->hidden) {
+            $chapterid = $lastuserviewedchapter;
+        }
+    }
 }
 
 $courseurl = new moodle_url('/course/view.php', array('id' => $course->id));
