@@ -302,44 +302,44 @@ function book_get_toc($chapters, $chapter, $book, $cm, $edit) {
             $toc .= html_writer::start_tag('div', array('class' => 'action-list d-flex ml-auto'));
             if ($i != 1) {
                 $toc .= html_writer::link(new moodle_url('move.php', array('id' => $cm->id, 'chapterid' => $ch->id, 'up' => '1', 'sesskey' => $USER->sesskey)),
-                        $OUTPUT->pix_icon('t/up', get_string('movechapterup', 'mod_book', $title)),
-                        array('title' => get_string('movechapterup', 'mod_book', $titleunescaped)));
+                    $OUTPUT->pix_icon('t/up', get_string('movechapterup', 'mod_book', $title)),
+                    array('title' => get_string('movechapterup', 'mod_book', $titleunescaped)));
             }
             if ($i != count($chapters)) {
                 $toc .= html_writer::link(new moodle_url('move.php', array('id' => $cm->id, 'chapterid' => $ch->id, 'up' => '0', 'sesskey' => $USER->sesskey)),
-                        $OUTPUT->pix_icon('t/down', get_string('movechapterdown', 'mod_book', $title)),
-                        array('title' => get_string('movechapterdown', 'mod_book', $titleunescaped)));
+                    $OUTPUT->pix_icon('t/down', get_string('movechapterdown', 'mod_book', $title)),
+                    array('title' => get_string('movechapterdown', 'mod_book', $titleunescaped)));
             }
             $toc .= html_writer::link(new moodle_url('edit.php', array('cmid' => $cm->id, 'id' => $ch->id)),
-                    $OUTPUT->pix_icon('t/edit', get_string('editchapter', 'mod_book', $title)),
-                    array('title' => get_string('editchapter', 'mod_book', $titleunescaped)));
+                $OUTPUT->pix_icon('t/edit', get_string('editchapter', 'mod_book', $title)),
+                array('title' => get_string('editchapter', 'mod_book', $titleunescaped)));
 
             $deleteaction = new confirm_action(get_string('deletechapter', 'mod_book', $titleunescaped));
             $toc .= $OUTPUT->action_icon(
-                    new moodle_url('delete.php', [
-                            'id'        => $cm->id,
-                            'chapterid' => $ch->id,
-                            'sesskey'   => sesskey(),
-                            'confirm'   => 1,
-                        ]),
-                    new pix_icon('t/delete', get_string('deletechapter', 'mod_book', $title)),
-                    $deleteaction,
-                    ['title' => get_string('deletechapter', 'mod_book', $titleunescaped)]
-                );
+                new moodle_url('delete.php', [
+                    'id'        => $cm->id,
+                    'chapterid' => $ch->id,
+                    'sesskey'   => sesskey(),
+                    'confirm'   => 1,
+                ]),
+                new pix_icon('t/delete', get_string('deletechapter', 'mod_book', $title)),
+                $deleteaction,
+                ['title' => get_string('deletechapter', 'mod_book', $titleunescaped)]
+            );
 
             if ($ch->hidden) {
                 $toc .= html_writer::link(new moodle_url('show.php', array('id' => $cm->id, 'chapterid' => $ch->id, 'sesskey' => $USER->sesskey)),
-                        $OUTPUT->pix_icon('t/show', get_string('showchapter', 'mod_book', $title)),
-                        array('title' => get_string('showchapter', 'mod_book', $titleunescaped)));
+                    $OUTPUT->pix_icon('t/show', get_string('showchapter', 'mod_book', $title)),
+                    array('title' => get_string('showchapter', 'mod_book', $titleunescaped)));
             } else {
                 $toc .= html_writer::link(new moodle_url('show.php', array('id' => $cm->id, 'chapterid' => $ch->id, 'sesskey' => $USER->sesskey)),
-                        $OUTPUT->pix_icon('t/hide', get_string('hidechapter', 'mod_book', $title)),
-                        array('title' => get_string('hidechapter', 'mod_book', $titleunescaped)));
+                    $OUTPUT->pix_icon('t/hide', get_string('hidechapter', 'mod_book', $title)),
+                    array('title' => get_string('hidechapter', 'mod_book', $titleunescaped)));
             }
 
             $buttontitle = get_string('addafterchapter', 'mod_book', ['title' => $ch->title]);
             $toc .= html_writer::link(new moodle_url('edit.php', array('cmid' => $cm->id, 'pagenum' => $ch->pagenum, 'subchapter' => $ch->subchapter)),
-                                            $OUTPUT->pix_icon('add', $buttontitle, 'mod_book'), array('title' => $buttontitle));
+                $OUTPUT->pix_icon('add', $buttontitle, 'mod_book'), array('title' => $buttontitle));
             $toc .= html_writer::end_tag('div');
             $toc .= html_writer::end_tag('div');
 
@@ -374,7 +374,7 @@ function book_get_toc($chapters, $chapter, $book, $cm, $edit) {
                     }
 
                     if ($book->numbering == BOOK_NUM_NUMBERS) {
-                          $title = "$nch. $title";
+                        $title = "$nch. $title";
                     }
                 } else {
                     $ns++;
@@ -388,7 +388,7 @@ function book_get_toc($chapters, $chapter, $book, $cm, $edit) {
                     }
 
                     if ($book->numbering == BOOK_NUM_NUMBERS) {
-                          $title = "$nch.$ns. $title";
+                        $title = "$nch.$ns. $title";
                     }
                 }
 
@@ -398,8 +398,8 @@ function book_get_toc($chapters, $chapter, $book, $cm, $edit) {
                     $toc .= html_writer::tag('strong', $title, array('class' => $cssclass));
                 } else {
                     $toc .= html_writer::link(new moodle_url('view.php',
-                                              array('id' => $cm->id, 'chapterid' => $ch->id)),
-                                              $title, array('title' => s($titleunescaped), 'class' => $cssclass));
+                        array('id' => $cm->id, 'chapterid' => $ch->id)),
+                        $title, array('title' => s($titleunescaped), 'class' => $cssclass));
                 }
 
                 if (!$ch->subchapter) {
@@ -461,7 +461,7 @@ function mod_book_get_tagged_chapters($tag, $exclusivemode = false, $fromctx = 0
                  AND bc.id %ITEMFILTER% AND c.id %COURSEFILTER%";
 
     $params = array('itemtype' => 'book_chapters', 'tagid' => $tag->id, 'component' => 'mod_book',
-                    'coursemodulecontextlevel' => CONTEXT_MODULE);
+        'coursemodulecontextlevel' => CONTEXT_MODULE);
 
     if ($ctx) {
         $context = $ctx ? context::instance_by_id($ctx) : context_system::instance();
@@ -543,41 +543,78 @@ function mod_book_get_tagged_chapters($tag, $exclusivemode = false, $fromctx = 0
 /**
  * Returns the ID of the last visited page
  *
- * @param int $courseid
- * @param int $contextinstanceid
- *
+ * @param int $bookid
  * @return bool
- *
- * @throws dml_exception
  */
-function mod_book_get_user_last_viewed_chapter($courseid, $contextinstanceid) {
+function mod_book_get_user_last_viewed_chapter($bookid) {
     global $DB, $USER;
 
+    $sql = "SELECT uv.chapterid
+            FROM {book_chapters_userviews} uv
+            INNER JOIN {book_chapters} bc ON bc.id = uv.chapterid
+            INNER JOIN {book} b ON b.id = bc.bookid
+            WHERE bc.bookid = :bookid AND uv.userid = :userid AND bc.hidden = 0
+            ORDER BY uv.timecreated DESC";
+
     $parameters = [
-        'component' => 'mod_book',
-        'action' => 'viewed',
-        'target' => 'chapter',
-        'objecttable' => 'book_chapters',
-        'contextinstanceid' => $contextinstanceid,
-        'courseid' => $courseid,
+        'bookid' => $bookid,
         'userid' => $USER->id
     ];
-
-    $sql = "SELECT objectid
-            FROM {logstore_standard_log}
-            WHERE component = :component
-                AND action = :action
-                AND target = :target
-                AND objecttable = :objecttable
-                AND contextinstanceid = :contextinstanceid
-                AND courseid = :courseid
-                AND userid = :userid
-            ORDER BY timecreated desc";
 
     $record = $DB->get_record_sql($sql, $parameters, IGNORE_MULTIPLE);
 
     if ($record) {
-        return $record->objectid;
+        return $record->chapterid;
+    }
+
+    return false;
+}
+
+/**
+ * Returns the user progress in a book based on their userviews
+ *
+ * @param int $bookid
+ * @param int $userid
+ * @return int
+ */
+function mod_book_get_book_userview_progress($bookid, $userid) {
+    global $DB;
+
+    $chapters = $DB->get_records('book_chapters', ['bookid' => $bookid, 'hidden' => 0], 'id', 'id');
+
+    $userviewedchapters = mod_book_get_book_userviews($bookid, $userid);
+
+    if (!$chapters || !$userviewedchapters) {
+        return 0;
+    }
+
+    return (int)((count($userviewedchapters) / count($chapters)) * 100);
+}
+
+/**
+ * Returns all chapters views of a user.
+ *
+ * @param int $bookid
+ * @param int $userid
+ * @return array|bool
+ */
+function mod_book_get_book_userviews($bookid, $userid) {
+    global $DB;
+
+    $userviewedchapterssql = "SELECT DISTINCT uv.chapterid
+                              FROM {book_chapters_userviews} uv
+                              INNER JOIN {book_chapters} bc ON bc.id = uv.chapterid
+                              INNER JOIN {book} b ON b.id = bc.bookid
+                              WHERE bc.bookid = :bookid AND uv.userid = :userid AND bc.hidden = 0";
+    $parameters = [
+        'bookid' => $bookid,
+        'userid' => $userid
+    ];
+
+    $userviewedchapters = $DB->get_records_sql($userviewedchapterssql, $parameters);
+
+    if ($userviewedchapters) {
+        return $userviewedchapters;
     }
 
     return false;
@@ -624,12 +661,12 @@ class book_file_info extends file_info {
      * @return array with keys contextid, filearea, itemid, filepath and filename
      */
     public function get_params() {
-        return array('contextid'=>$this->context->id,
-                     'component'=>'mod_book',
-                     'filearea' =>$this->filearea,
-                     'itemid'   =>null,
-                     'filepath' =>null,
-                     'filename' =>null);
+        return array('contextid' => $this->context->id,
+            'component' => 'mod_book',
+            'filearea' => $this->filearea,
+            'itemid' => null,
+            'filepath' => null,
+            'filename' => null);
     }
 
     /**

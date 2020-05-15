@@ -307,6 +307,8 @@ function book_supports($feature) {
         case FEATURE_GROUPINGS:               return false;
         case FEATURE_MOD_INTRO:               return true;
         case FEATURE_COMPLETION_TRACKS_VIEWS: return true;
+        case FEATURE_COMPLETION_HAS_RULES:
+            return true;
         case FEATURE_GRADE_HAS_GRADE:         return false;
         case FEATURE_GRADE_OUTCOMES:          return false;
         case FEATURE_BACKUP_MOODLE2:          return true;
@@ -335,7 +337,7 @@ function book_extend_settings_navigation(settings_navigation $settingsnav, navig
     $params = $PAGE->url->params();
 
     if ($PAGE->cm->modname === 'book' and !empty($params['id']) and !empty($params['chapterid'])
-            and has_capability('mod/book:edit', $PAGE->cm->context)) {
+        and has_capability('mod/book:edit', $PAGE->cm->context)) {
         if (!empty($USER->editing)) {
             $string = get_string("turneditingoff");
             $edit = '0';
@@ -473,7 +475,7 @@ function book_pluginfile($course, $cm, $context, $filearea, $args, $forcedownloa
 
         // We need to rewrite the pluginfile URLs so the media filters can work.
         $content = file_rewrite_pluginfile_urls($chapter->content, 'webservice/pluginfile.php', $context->id, 'mod_book', 'chapter',
-                                                $chapter->id);
+            $chapter->id);
         $formatoptions = new stdClass;
         $formatoptions->noclean = true;
         $formatoptions->overflowdiv = true;
@@ -484,7 +486,7 @@ function book_pluginfile($course, $cm, $context, $filearea, $args, $forcedownloa
         // Remove @@PLUGINFILE@@/.
         $options = array('reverse' => true);
         $content = file_rewrite_pluginfile_urls($content, 'webservice/pluginfile.php', $context->id, 'mod_book', 'chapter',
-                                                $chapter->id, $options);
+            $chapter->id, $options);
         $content = str_replace('@@PLUGINFILE@@/', '', $content);
 
         $titles = "";
@@ -598,7 +600,7 @@ function book_export_contents($cm, $baseurl) {
         $chapterindexfile['filepath']     = "/{$chapter->id}/";
         $chapterindexfile['filesize']     = 0;
         $chapterindexfile['fileurl']      = moodle_url::make_webservice_pluginfile_url(
-                    $context->id, 'mod_book', 'chapter', $chapter->id, '/', 'index.html')->out(false);
+            $context->id, 'mod_book', 'chapter', $chapter->id, '/', 'index.html')->out(false);
         $chapterindexfile['timecreated']  = $chapter->timecreated;
         $chapterindexfile['timemodified'] = $chapter->timemodified;
         $chapterindexfile['content']      = format_string($chapter->title, true, array('context' => $context));
@@ -618,8 +620,8 @@ function book_export_contents($cm, $baseurl) {
             $file['filepath']     = "/{$chapter->id}" . $fileinfo->get_filepath();
             $file['filesize']     = $fileinfo->get_filesize();
             $file['fileurl']      = moodle_url::make_webservice_pluginfile_url(
-                                        $context->id, 'mod_book', 'chapter', $chapter->id,
-                                        $fileinfo->get_filepath(), $fileinfo->get_filename())->out(false);
+                $context->id, 'mod_book', 'chapter', $chapter->id,
+                $fileinfo->get_filepath(), $fileinfo->get_filename())->out(false);
             $file['timecreated']  = $fileinfo->get_timecreated();
             $file['timemodified'] = $fileinfo->get_timemodified();
             $file['sortorder']    = $fileinfo->get_sortorder();
@@ -660,26 +662,40 @@ function book_export_contents($cm, $baseurl) {
  * Mark the activity completed (if required) and trigger the course_module_viewed event.
  *
  * @param  stdClass $book       book object
- * @param  stdClass $chapter    chapter object
- * @param  bool $islaschapter   is the las chapter of the book?
- * @param  stdClass $course     course object
- * @param  stdClass $cm         course module object
  * @param  stdClass $context    context object
+ * @param  stdClass $chapter    chapter object
  * @since Moodle 3.0
  */
-function book_view($book, $chapter, $islastchapter, $course, $cm, $context) {
+function book_view($book, $context, $chapter = null) {
+    global $DB, $USER;
+
+    $course = $DB->get_record('course', ['id' => $book->course], '*', MUST_EXIST);
+    $cm = $DB->get_record('course_modules', ['id' => $context->instanceid], '*', MUST_EXIST);
+
+    $completion = new completion_info($course);
 
     // First case, we are just opening the book.
     if (empty($chapter)) {
         \mod_book\event\course_module_viewed::create_from_book($book, $context)->trigger();
 
+        if ($cm->completionview && $book->readpercent == 0) {
+            $completion->set_module_viewed($cm);
+        }
     } else {
         \mod_book\event\chapter_viewed::create_from_chapter($book, $context, $chapter)->trigger();
 
-        if ($islastchapter) {
-            // We cheat a bit here in assuming that viewing the last page means the user viewed the whole book.
-            $completion = new completion_info($course);
-            $completion->set_module_viewed($cm);
+        $userview = new \stdClass();
+        $userview->chapterid = $chapter->id;
+        $userview->userid = $USER->id;
+        $userview->timecreated = time();
+
+        $DB->insert_record('book_chapters_userviews', $userview);
+
+        if ($completion->is_enabled($cm)) {
+            if (($cm->completionview && $book->readpercent == 0) ||
+                ($book->readpercent != 0 && book_get_completion_state($course, $cm, $USER->id, COMPLETION_AND))) {
+                $completion->set_module_viewed($cm);
+            }
         }
     }
 }
@@ -781,4 +797,39 @@ function mod_book_core_calendar_provide_event_action(calendar_event $event,
         1,
         true
     );
+}
+
+/**
+ * Obtains the automatic completion state for this book based on any conditions in book settings.
+ *
+ * @param stdClass $course
+ * @param stdClass $cm
+ * @param int $userid
+ * @param bool $type
+ * @return bool
+ */
+function book_get_completion_state($course, $cm, $userid, $type) {
+    global $CFG, $DB;
+
+    try {
+        $book = $DB->get_record('book', array('id' => $cm->instance), '*', MUST_EXIST);
+
+        if (!$book->readpercent) {
+            return $type;
+        }
+
+        $percentviewed = mod_book_get_book_userview_progress($book->id, $userid);
+
+        if ($percentviewed >= $book->readpercent) {
+            return true;
+        }
+
+        return false;
+    } catch (\Exception $e) {
+        if ($CFG->debug == DEBUG_DEVELOPER) {
+            throw $e;
+        }
+
+        return $type;
+    }
 }
