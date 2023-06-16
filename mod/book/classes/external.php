@@ -74,10 +74,10 @@ class mod_book_external extends external_api {
         require_once($CFG->dirroot . "/mod/book/locallib.php");
 
         $params = self::validate_parameters(self::view_book_parameters(),
-                                            array(
-                                                'bookid' => $bookid,
-                                                'chapterid' => $chapterid
-                                            ));
+            array(
+                'bookid' => $bookid,
+                'chapterid' => $chapterid
+            ));
         $bookid = $params['bookid'];
         $chapterid = $params['chapterid'];
 
@@ -101,12 +101,13 @@ class mod_book_external extends external_api {
             }
             if (!$firstchapterid) {
                 $firstchapterid = $ch->id;
+                break;
             }
         }
 
         if (!$chapterid) {
             // Trigger the module viewed events since we are displaying the book.
-            book_view($book, null, false, $course, $cm, $context);
+            book_view($book, $context);
             $chapterid = $firstchapterid;
         }
 
@@ -126,8 +127,7 @@ class mod_book_external extends external_api {
                 throw new moodle_exception('errorchapter', 'mod_book');
             }
 
-            // Trigger the chapter viewed event.
-            book_view($book, $chapter, \mod_book\helper::is_last_visible_chapter($chapterid, $chapters), $course, $cm, $context);
+            book_view($book, $context, $chapter);
         }
 
         $result = array();
