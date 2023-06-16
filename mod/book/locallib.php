@@ -595,56 +595,6 @@ function mod_book_get_user_last_viewed_chapter($bookid) {
 }
 
 /**
- * Returns the user progress in a book based on their userviews
- *
- * @param int $bookid
- * @param int $userid
- * @return int
- */
-function mod_book_get_book_userview_progress($bookid, $userid) {
-    global $DB;
-
-    $chapters = $DB->get_records('book_chapters', ['bookid' => $bookid, 'hidden' => 0], 'id', 'id');
-
-    $userviewedchapters = mod_book_get_book_userviews($bookid, $userid);
-
-    if (!$chapters || !$userviewedchapters) {
-        return 0;
-    }
-
-    return (int)((count($userviewedchapters) / count($chapters)) * 100);
-}
-
-/**
- * Returns all chapters views of a user.
- *
- * @param int $bookid
- * @param int $userid
- * @return array|bool
- */
-function mod_book_get_book_userviews($bookid, $userid) {
-    global $DB;
-
-    $userviewedchapterssql = "SELECT DISTINCT uv.chapterid
-                              FROM {book_chapters_userviews} uv
-                              INNER JOIN {book_chapters} bc ON bc.id = uv.chapterid
-                              INNER JOIN {book} b ON b.id = bc.bookid
-                              WHERE bc.bookid = :bookid AND uv.userid = :userid AND bc.hidden = 0";
-    $parameters = [
-        'bookid' => $bookid,
-        'userid' => $userid
-    ];
-
-    $userviewedchapters = $DB->get_records_sql($userviewedchapterssql, $parameters);
-
-    if ($userviewedchapters) {
-        return $userviewedchapters;
-    }
-
-    return false;
-}
-
-/**
  * File browsing support class
  *
  * @copyright  2010-2011 Petr Skoda {@link http://skodak.org}

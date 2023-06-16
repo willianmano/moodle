@@ -118,7 +118,7 @@ class mod_book_mod_form extends moodleform_mod {
         $mform = $this->_form;
 
         $completionviews = [];
-        for ($i = 0; $i <= 100; $i += 10) {
+        for ($i = 1; $i <= 100; $i ++) {
             $completionviews[$i] = $i . '%';
         }
 

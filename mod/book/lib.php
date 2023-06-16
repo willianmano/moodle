@@ -814,27 +814,69 @@ function mod_book_core_calendar_provide_event_action(calendar_event $event,
  * @return bool
  */
 function book_get_completion_state($course, $cm, $userid, $type) {
-    global $CFG, $DB;
+    return \mod_book\helper::is_book_read_completed($cm->instance, $userid);
+}
 
-    try {
-        $book = $DB->get_record('book', array('id' => $cm->instance), '*', MUST_EXIST);
+/**
+ * Add a get_coursemodule_info function in case any survey type wants to add 'extra' information
+ * for the course (see resource).
+ *
+ * Given a course_module object, this function returns any "extra" information that may be needed
+ * when printing this activity in a course listing.  See get_array_of_activities() in course/lib.php.
+ *
+ * @param stdClass $coursemodule The coursemodule object (record).
+ * @return cached_cm_info An object on information that the courses
+ *                        will know about (most noticeably, an icon).
+ */
+function book_get_coursemodule_info($coursemodule) {
+    global $DB;
 
-        if (!$book->readpercent) {
-            return $type;
-        }
-
-        $percentviewed = mod_book_get_book_userview_progress($book->id, $userid);
-
-        if ($percentviewed >= $book->readpercent) {
-            return true;
-        }
-
+    $dbparams = ['id' => $coursemodule->instance];
+    $fields = 'id, name, intro, introformat, readpercent';
+    if (!$book = $DB->get_record('book', $dbparams, $fields)) {
         return false;
-    } catch (\Exception $e) {
-        if ($CFG->debug == DEBUG_DEVELOPER) {
-            throw $e;
-        }
-
-        return $type;
     }
+
+    $result = new cached_cm_info();
+    $result->name = $book->name;
+
+    if ($coursemodule->showdescription) {
+        // Convert intro to html. Do not filter cached version, filters run at display time.
+        $result->content = format_module_intro('book', $book, $coursemodule->id, false);
+    }
+
+    // Populate the custom completion rules as key => value pairs, but only if the completion mode is 'automatic'.
+    if ($coursemodule->completion == COMPLETION_TRACKING_AUTOMATIC) {
+        $result->customdata['customcompletionrules']['readpercent'] = $book->readpercent;
+    }
+
+    return $result;
+}
+
+/**
+ * Callback which returns human-readable strings describing the active completion custom rules for the module instance.
+ *
+ * @param cm_info|stdClass $cm object with fields ->completion and ->customdata['customcompletionrules']
+ * @return array $descriptions the array of descriptions for the custom rules.
+ */
+function mod_book_get_completion_active_rule_descriptions($cm) {
+    // Values will be present in cm_info, and we assume these are up to date.
+    if (empty($cm->customdata['customcompletionrules']) || $cm->completion != COMPLETION_TRACKING_AUTOMATIC) {
+        return [];
+    }
+
+    $descriptions = [];
+    foreach ($cm->customdata['customcompletionrules'] as $key => $val) {
+        switch ($key) {
+            case 'readpercent':
+                if (!empty($val)) {
+                    $descriptions[] = get_string('readpercentstatus', 'mod_book', $cm->customdata['customcompletionrules']['readpercent']);
+                }
+                break;
+            default:
+                break;
+        }
+    }
+
+    return $descriptions;
 }

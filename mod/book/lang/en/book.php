@@ -117,9 +117,10 @@ $string['removeallbooktags'] = 'Remove all book tags';
 $string['tagarea_book_chapters'] = 'Book chapters';
 $string['tagsdeleted'] = 'Book tags have been deleted';
 
-$string['requiredreadpercent'] = 'The user needs to read at least this percent of the Book:';
+$string['requiredreadpercent'] = 'The user needs to read at least this percent of the Book: ';
 $string['readpercentselect'] = 'Required read percent';
 $string['readpercentvalidation'] = 'You need to define the required read percentage';
+$string['readpercentstatus'] = 'You need to read at least {$a}% of the book';
 
 $string['privacy:metadata:book_chapters_userviews'] = 'Information about book pages user view history';
 $string['privacy:metadata:book_chapters_userviews:chapterid'] = 'Chapter viewed';
