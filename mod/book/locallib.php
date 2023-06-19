@@ -544,9 +544,10 @@ function mod_book_get_tagged_chapters($tag, $exclusivemode = false, $fromctx = 0
  * Returns the ID of the last visited page to show
  *
  * @param int $bookid
+ * @oaram array $chapters
  * @return bool|int
  */
-function mod_book_get_user_last_viewed_chapter_to_show(int $bookid, $chapters) {
+function mod_book_get_user_last_viewed_chapter_to_show(int $bookid, array $chapters) {
     $lastuserviewedchapterid = mod_book_get_user_last_viewed_chapter($bookid);
 
     if ($lastuserviewedchapterid === false) {

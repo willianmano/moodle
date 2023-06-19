@@ -45,8 +45,8 @@ class helper {
     /**
      * Check if the user completed the book read based on its read percent requirement
      *
-     * @param $bookid
-     * @param $userid
+     * @param int $bookid
+     * @param int $userid
      * @return bool
      * @throws \dml_exception
      */
