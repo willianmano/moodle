@@ -74,10 +74,10 @@ class mod_book_external extends external_api {
         require_once($CFG->dirroot . "/mod/book/locallib.php");
 
         $params = self::validate_parameters(self::view_book_parameters(),
-            array(
-                'bookid' => $bookid,
-                'chapterid' => $chapterid
-            ));
+                                            array(
+                                                'bookid' => $bookid,
+                                                'chapterid' => $chapterid
+                                            ));
         $bookid = $params['bookid'];
         $chapterid = $params['chapterid'];
 

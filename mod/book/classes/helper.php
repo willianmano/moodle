@@ -51,29 +51,21 @@ class helper {
      * @throws \dml_exception
      */
     public static function is_book_read_completed($bookid, $userid) {
-        global $DB, $CFG;
+        global $DB;
 
-        try {
-            $book = $DB->get_record('book', array('id' => $bookid), '*', MUST_EXIST);
+        $book = $DB->get_record('book', array('id' => $bookid), '*', MUST_EXIST);
 
-            if (!$book->readpercent) {
-                return false;
-            }
-
-            $percentviewed = self::get_book_userview_progress($book->id, $userid);
-
-            if ($percentviewed >= $book->readpercent) {
-                return true;
-            }
-
-            return false;
-        } catch (\Exception $e) {
-            if ($CFG->debug == DEBUG_DEVELOPER) {
-                throw $e;
-            }
-
+        if (!$book->readpercent) {
             return false;
         }
+
+        $percentviewed = self::get_book_userview_progress($book->id, $userid);
+
+        if ($percentviewed >= $book->readpercent) {
+            return true;
+        }
+
+        return false;
     }
 
     /**

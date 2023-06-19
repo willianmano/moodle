@@ -93,7 +93,7 @@ class mod_book_mod_form extends moodleform_mod {
     public function data_preprocessing(&$defaultvalues) {
         parent::data_preprocessing($defaultvalues);
 
-        $defaultvalues['readpercentactive'] = $defaultvalues['readpercent'] != "0" ? 1 : 0;
+        $defaultvalues['readpercentactive'] = !empty($defaultvalues['readpercent']) ? 1 : 0;
     }
 
     /**
@@ -104,7 +104,7 @@ class mod_book_mod_form extends moodleform_mod {
     public function data_postprocessing($data) {
         parent::data_postprocessing($data);
 
-        $data->readpercentactive = empty($data->readpercent) ? "0" : "1";
+        $data->readpercent = empty($data->readpercentactive) ? null : $data->readpercent;
     }
 
     /**
@@ -144,7 +144,7 @@ class mod_book_mod_form extends moodleform_mod {
     public function validation($data, $files) {
         $errors = parent::validation($data, $files);
 
-        if ($data['readpercentactive'] && $data['readpercent'] == '0') {
+        if (isset($data['readpercentactive']) && $data['readpercent'] == '0') {
             $errors['completionviewgroup'] = get_string('readpercentvalidation', 'mod_book');
         }
 

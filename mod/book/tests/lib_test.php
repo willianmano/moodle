@@ -204,7 +204,7 @@ class lib_test extends \advanced_testcase {
         // Setup test data.
         $course = $this->getDataGenerator()->create_course(array('enablecompletion' => 1));
         $book = $this->getDataGenerator()->create_module('book', array('course' => $course->id),
-            array('completion' => 2, 'completionview' => 1));
+                                                                       array('completion' => 2, 'completionview' => 1));
         $bookgenerator = $this->getDataGenerator()->get_plugin_generator('mod_book');
         $chapter = $bookgenerator->create_chapter(array('bookid' => $book->id));
 
@@ -243,6 +243,11 @@ class lib_test extends \advanced_testcase {
         $this->assertEquals(1, $completiondata->completionstate);
     }
 
+    /**
+     * Test book completion only using completion view setting
+     *
+     * @return void
+     */
     public function test_book_view_completion_with_chapter_view() {
         global $CFG;
 
@@ -269,6 +274,12 @@ class lib_test extends \advanced_testcase {
         $this->assertCount(3, $events);
     }
 
+    /**
+     * Test book completion using read percentage configured
+     *
+     * @return void
+     * @throws \coding_exception
+     */
     public function test_book_view_completion_view_with_readpercent() {
         global $CFG;
 
@@ -295,8 +306,8 @@ class lib_test extends \advanced_testcase {
 
         $events = $sink->get_events();
 
-        // Chapter viewed event.
-        $this->assertCount(1, $events);
+        // Course module viewed and course module completion updated events.
+        $this->assertCount(2, $events);
 
         // Check that completion status is incomplete.
         $completion = new \completion_info($course);

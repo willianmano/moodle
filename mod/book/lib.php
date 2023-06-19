@@ -482,7 +482,7 @@ function book_pluginfile($course, $cm, $context, $filearea, $args, $forcedownloa
 
         // We need to rewrite the pluginfile URLs so the media filters can work.
         $content = file_rewrite_pluginfile_urls($chapter->content, 'webservice/pluginfile.php', $context->id, 'mod_book', 'chapter',
-            $chapter->id);
+                                                $chapter->id);
         $formatoptions = new stdClass;
         $formatoptions->noclean = true;
         $formatoptions->overflowdiv = true;
@@ -493,7 +493,7 @@ function book_pluginfile($course, $cm, $context, $filearea, $args, $forcedownloa
         // Remove @@PLUGINFILE@@/.
         $options = array('reverse' => true);
         $content = file_rewrite_pluginfile_urls($content, 'webservice/pluginfile.php', $context->id, 'mod_book', 'chapter',
-            $chapter->id, $options);
+                                                $chapter->id, $options);
         $content = str_replace('@@PLUGINFILE@@/', '', $content);
 
         $titles = "";
@@ -607,7 +607,7 @@ function book_export_contents($cm, $baseurl) {
         $chapterindexfile['filepath']     = "/{$chapter->id}/";
         $chapterindexfile['filesize']     = 0;
         $chapterindexfile['fileurl']      = moodle_url::make_webservice_pluginfile_url(
-            $context->id, 'mod_book', 'chapter', $chapter->id, '/', 'index.html')->out(false);
+                    $context->id, 'mod_book', 'chapter', $chapter->id, '/', 'index.html')->out(false);
         $chapterindexfile['timecreated']  = $chapter->timecreated;
         $chapterindexfile['timemodified'] = $chapter->timemodified;
         $chapterindexfile['content']      = format_string($chapter->title, true, array('context' => $context));
@@ -627,8 +627,8 @@ function book_export_contents($cm, $baseurl) {
             $file['filepath']     = "/{$chapter->id}" . $fileinfo->get_filepath();
             $file['filesize']     = $fileinfo->get_filesize();
             $file['fileurl']      = moodle_url::make_webservice_pluginfile_url(
-                $context->id, 'mod_book', 'chapter', $chapter->id,
-                $fileinfo->get_filepath(), $fileinfo->get_filename())->out(false);
+                                        $context->id, 'mod_book', 'chapter', $chapter->id,
+                                        $fileinfo->get_filepath(), $fileinfo->get_filename())->out(false);
             $file['timecreated']  = $fileinfo->get_timecreated();
             $file['timemodified'] = $fileinfo->get_timemodified();
             $file['sortorder']    = $fileinfo->get_sortorder();
@@ -685,9 +685,15 @@ function book_view($book, $context, $chapter = null) {
     if (empty($chapter)) {
         \mod_book\event\course_module_viewed::create_from_book($book, $context)->trigger();
 
-        if ($cm->completionview && $book->readpercent == 0) {
+        if (!$completion->is_enabled($cm)) {
+            return;
+        }
+
+        if ($cm->completionview) {
             $completion->set_module_viewed($cm);
         }
+
+        $completion->update_state($cm, COMPLETION_INCOMPLETE);
     } else {
         $userview = new \stdClass();
         $userview->chapterid = $chapter->id;
@@ -698,12 +704,15 @@ function book_view($book, $context, $chapter = null) {
 
         \mod_book\event\chapter_viewed::create_from_chapter($book, $context, $chapter)->trigger();
 
-        if ($completion->is_enabled($cm)) {
-            if (($cm->completionview && $book->readpercent == 0) ||
-                ($book->readpercent != 0 && book_get_completion_state($course, $cm, $USER->id, COMPLETION_AND))) {
-                $completion->set_module_viewed($cm);
-            }
+        if (!$completion->is_enabled($cm)) {
+            return;
         }
+
+        if ($cm->completionview) {
+            $completion->set_module_viewed($cm);
+        }
+
+        $completion->update_state($cm, COMPLETION_COMPLETE);
     }
 }
 
@@ -802,19 +811,6 @@ function mod_book_core_calendar_provide_event_action(calendar_event $event,
         1,
         true
     );
-}
-
-/**
- * Obtains the automatic completion state for this book based on any conditions in book settings.
- *
- * @param stdClass $course
- * @param stdClass $cm
- * @param int $userid
- * @param bool $type
- * @return bool
- */
-function book_get_completion_state($course, $cm, $userid, $type) {
-    return \mod_book\helper::is_book_read_completed($cm->instance, $userid);
 }
 
 /**
