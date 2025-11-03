@@ -77,7 +77,7 @@ if ($allowedit and !$chapters) {
 // Check chapterid and read chapter data
 if ($chapterid == '0') { // Go to first chapter if no given.
     // Trigger course module viewed event.
-    book_view($book, null, false, $course, $cm, $context);
+    book_view($book, $context);
 
     foreach ($chapters as $ch) {
         if ($edit || ($ch->hidden && $viewhidden)) {
@@ -116,7 +116,7 @@ if (!$chapterid) {
     }
     // Add the Book TOC block.
     book_add_fake_block($chapters, $chapter, $book, $cm, $edit);
-    book_view($book, $chapter, \mod_book\helper::is_last_visible_chapter($chapter->id, $chapters), $course, $cm, $context);
+    book_view($book, $context, $chapter);
 
     echo $OUTPUT->header();
 

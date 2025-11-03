@@ -116,3 +116,13 @@ $string['tagarea_book_chapters'] = 'Book chapters';
 
 // Deprecated since Moodle 4.5.
 $string['tagsdeleted'] = 'Book tags have been deleted';
+
+$string['requiredreadpercent'] = 'The user needs to read at least this percent of the Book:';
+$string['readpercentselect'] = 'Required read percent';
+$string['readpercentvalidation'] = 'You need to define the required read percentage';
+$string['readpercentstatus'] = 'You need to read at least {$a}% of the book';
+
+$string['privacy:metadata:book_chapters_userviews'] = 'Information about book pages user view history';
+$string['privacy:metadata:book_chapters_userviews:chapterid'] = 'Chapter viewed';
+$string['privacy:metadata:book_chapters_userviews:userid'] = 'User who viewed the page';
+$string['privacy:metadata:book_chapters_userviews:timecreated'] = 'Time when the user viewed the page';
