@@ -599,6 +599,62 @@ function mod_book_get_book_userviews($bookid, $userid) {
 }
 
 /**
+ * Returns the ID of the last visited page to show
+ *
+ * @param int $bookid
+ * @param array $chapters
+ * @return int|bool
+ */
+function mod_book_get_user_last_viewed_chapter_to_show(int $bookid, array $chapters): int|bool {
+    $lastuserviewedchapterid = mod_book_get_user_last_viewed_chapter($bookid);
+
+    if ($lastuserviewedchapterid === false) {
+        return false;
+    }
+
+    if (!isset($chapters[$lastuserviewedchapterid])) {
+        return false;
+    }
+
+    if ($chapters[$lastuserviewedchapterid]->hidden) {
+        return false;
+    }
+
+    return $lastuserviewedchapterid;
+}
+
+/**
+ * Returns the ID of the last visited page based on the book user views
+ *
+ * @param int $bookid
+ * @return bool
+ */
+function mod_book_get_user_last_viewed_chapter($bookid) {
+    global $DB, $USER;
+
+    $sql = "SELECT uv.chapterid
+            FROM {book_chapters_userviews} uv
+            INNER JOIN {book_chapters} bc ON bc.id = uv.chapterid
+            INNER JOIN {book} b ON b.id = bc.bookid
+            WHERE bc.bookid = :bookid AND uv.userid = :userid AND bc.hidden = 0
+            ORDER BY uv.timecreated DESC
+            LIMIT 1";
+
+    $parameters = [
+        'bookid' => $bookid,
+        'userid' => $USER->id,
+    ];
+
+    $record = $DB->get_record_sql($sql, $parameters);
+
+    if ($record) {
+        return $record->chapterid;
+    }
+
+    return false;
+}
+
+/**
  * File browsing support class
  *
  * @copyright  2010-2011 Petr Skoda {@link http://skodak.org}
