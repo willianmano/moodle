@@ -86,8 +86,8 @@ function xmldb_book_upgrade($oldversion) {
         $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10');
 
         // Adding keys to table book_chapters_userviews.
-        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
-        $table->add_key('chapterid', XMLDB_KEY_FOREIGN, array('chapterid'), 'book_chapters', array('id'));
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+        $table->add_key('chapterid', XMLDB_KEY_FOREIGN, ['chapterid'], 'book_chapters', ['id']);
 
         // Conditionally launch create table for book_chapters_userviews.
         if (!$dbman->table_exists($table)) {

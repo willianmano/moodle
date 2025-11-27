@@ -86,7 +86,7 @@ class helper {
                               WHERE bc.bookid = :bookid AND uv.userid = :userid AND bc.hidden = 0";
         $parameters = [
             'bookid' => $bookid,
-            'userid' => $userid
+            'userid' => $userid,
         ];
 
         $userviewedchapters = $DB->get_records_sql($userviewedchapterssql, $parameters);

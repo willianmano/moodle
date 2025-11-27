@@ -586,7 +586,7 @@ function mod_book_get_book_userviews($bookid, $userid) {
                               WHERE bc.bookid = :bookid AND uv.userid = :userid AND bc.hidden = 0";
     $parameters = [
         'bookid' => $bookid,
-        'userid' => $userid
+        'userid' => $userid,
     ];
 
     $userviewedchapters = $DB->get_records_sql($userviewedchapterssql, $parameters);

@@ -110,13 +110,13 @@ function book_delete_instance($id) {
     $cm = get_coursemodule_from_instance('book', $id);
     \core_completion\api::update_completion_date_event($cm->id, 'book', $id, null);
 
-    $chapters = $DB->get_records('book_chapters', ['bookid' => $book->id]);
+    $chapters = $DB->get_fieldset('book_chapters', 'id', ['bookid' => $book->id]);
     if ($chapters) {
         foreach ($chapters as $chapter) {
             $DB->delete_records('book_chapters_userviews', ['chapterid' => $chapter->id]);
         }
 
-        $DB->delete_records('book_chapters', ['bookid'=>$book->id]);
+        $DB->delete_records('book_chapters', ['bookid' => $book->id]);
     }
 
     $DB->delete_records('book', ['id' => $book->id]);
@@ -315,8 +315,11 @@ function book_extend_settings_navigation(settings_navigation $settingsnav, navig
 
     $params = $settingsnav->get_page()->url->params();
 
-    if ($settingsnav->get_page()->cm->modname === 'book' && !empty($params['id']) && !empty($params['chapterid'])
-            && has_capability('mod/book:edit', $settingsnav->get_page()->cm->context)) {
+    if (
+        $settingsnav->get_page()->cm->modname === 'book' &&
+        !empty($params['id']) && !empty($params['chapterid']) &&
+        has_capability('mod/book:edit', $settingsnav->get_page()->cm->context)
+    ) {
         if (!empty($USER->editing)) {
             $string = get_string("turneditingoff");
             $edit = '0';
@@ -837,7 +840,11 @@ function mod_book_get_completion_active_rule_descriptions($cm) {
         switch ($key) {
             case 'readpercent':
                 if (!empty($val)) {
-                    $descriptions[] = get_string('readpercentstatus', 'mod_book', $cm->customdata['customcompletionrules']['readpercent']);
+                    $descriptions[] = get_string(
+                        'readpercentstatus',
+                        'mod_book',
+                        $cm->customdata['customcompletionrules']['readpercent']
+                    );
                 }
                 break;
             default:

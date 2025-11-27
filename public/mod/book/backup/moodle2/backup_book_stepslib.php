@@ -42,9 +42,7 @@ class backup_book_activity_structure_step extends backup_activity_structure_step
             'pagenum', 'subchapter', 'title', 'content', 'contentformat',
             'hidden', 'timemcreated', 'timemodified', 'importsrc'));
         $userviews = new backup_nested_element('chapters_userviews');
-        $userview = new backup_nested_element('userview', array('id'), array(
-            'chapterid', 'userid', 'timecreated'
-        ));
+        $userview = new backup_nested_element('userview', ['id'], ['chapterid', 'userid', 'timecreated']);
 
         $tags = new backup_nested_element('chaptertags');
         $tag = new backup_nested_element('tag', array('id'), array('itemid', 'rawname'));
@@ -61,7 +59,7 @@ class backup_book_activity_structure_step extends backup_activity_structure_step
             $chapter->add_child($userviews);
             $userviews->add_child($userview);
 
-            $userview->set_source_table('book_chapters_userviews', array('chapterid' => backup::VAR_PARENTID));
+            $userview->set_source_table('book_chapters_userviews', ['chapterid' => backup::VAR_PARENTID]);
         }
 
         // Define file annotations

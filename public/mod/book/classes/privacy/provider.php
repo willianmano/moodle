@@ -41,17 +41,16 @@ defined('MOODLE_INTERNAL') || die();
  * @copyright  2018 Shamim Rezaie <shamim@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class provider implements \core_privacy\local\metadata\provider,
-    \core_privacy\local\request\plugin\provider,
-    \core_privacy\local\request\core_userlist_provider {
-
+class provider implements \core_privacy\local\request\core_userlist_provider,
+    \core_privacy\local\metadata\provider,
+    \core_privacy\local\request\plugin\provider {
     /**
      * Returns metadata.
      *
      * @param collection $collection The initialised collection to add items to.
      * @return collection A listing of user data stored through this system.
      */
-    public static function get_metadata(collection $collection) : collection {
+    public static function get_metadata(collection $collection): collection {
         $collection->add_database_table('book_chapters_userviews', [
             'chapterid' => 'privacy:metadata:book_chapters_userviews:chapterid',
             'userid' => 'privacy:metadata:book_chapters_userviews:userid',
@@ -67,7 +66,7 @@ class provider implements \core_privacy\local\metadata\provider,
      * @param int $userid the userid.
      * @return contextlist the list of contexts containing user info for the user.
      */
-    public static function get_contexts_for_userid(int $userid) : contextlist {
+    public static function get_contexts_for_userid(int $userid): contextlist {
         $contextlist = new contextlist();
 
         // Fetch all data records that the user rote.
@@ -136,7 +135,9 @@ class provider implements \core_privacy\local\metadata\provider,
 
         $user = $contextlist->get_user();
 
-        list($contextsql, $contextparams) = $DB->get_in_or_equal($contextlist->get_contextids(), SQL_PARAMS_NAMED);
+        $sqlandparams = $DB->get_in_or_equal($contextlist->get_contextids(), SQL_PARAMS_NAMED);
+        $contextsql = $sqlandparams[0];
+        $contextparams = $sqlandparams[1];
 
         $sql = "SELECT
                     c.id AS contextid,
@@ -237,7 +238,10 @@ class provider implements \core_privacy\local\metadata\provider,
         $cm = $DB->get_record('course_modules', ['id' => $context->instanceid]);
         $book = $DB->get_record('book', ['id' => $cm->instance]);
 
-        list($userinsql, $userinparams) = $DB->get_in_or_equal($userlist->get_userids(), SQL_PARAMS_NAMED);
+        $sqlandparams = $DB->get_in_or_equal($userlist->get_userids(), SQL_PARAMS_NAMED);
+        $userinsql = $sqlandparams[0];
+        $userinparams = $sqlandparams[1];
+
         $params = array_merge(['bookid' => $book->id], $userinparams);
 
         // Delete all user view items.

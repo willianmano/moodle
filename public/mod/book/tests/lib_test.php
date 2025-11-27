@@ -249,15 +249,18 @@ final class lib_test extends \advanced_testcase {
      *
      * @return void
      */
-    public function test_book_view_completion_with_chapter_view() {
+    public function test_book_view_completion_with_chapter_view(): void {
         global $CFG;
 
         $CFG->enablecompletion = 1;
 
         // Setup test data.
         $course = $this->getDataGenerator()->create_course(['enablecompletion' => 1]);
-        $book = $this->getDataGenerator()->create_module('book', ['course' => $course->id],
-            ['completion' => 2, 'completionview' => 1]);
+        $book = $this->getDataGenerator()->create_module(
+            'book',
+            ['course' => $course->id],
+            ['completion' => 2, 'completionview' => 1]
+        );
         $bookgenerator = $this->getDataGenerator()->get_plugin_generator('mod_book');
         $chapter = $bookgenerator->create_chapter(['bookid' => $book->id]);
 
@@ -281,16 +284,18 @@ final class lib_test extends \advanced_testcase {
      * @return void
      * @throws \coding_exception
      */
-    public function test_book_view_completion_view_with_readpercent() {
+    public function test_book_view_completion_view_with_readpercent(): void {
         global $CFG;
 
         $CFG->enablecompletion = 1;
 
         // Setup test data.
         $course = $this->getDataGenerator()->create_course(['enablecompletion' => 1]);
-        $book = $this->getDataGenerator()->create_module('book',
+        $book = $this->getDataGenerator()->create_module(
+            'book',
             ['course' => $course->id, 'readpercent' => 50],
-            ['completion' => 2, 'completionview' => 1]);
+            ['completion' => 2, 'completionview' => 1]
+        );
         $bookgenerator = $this->getDataGenerator()->get_plugin_generator('mod_book');
         $chapter1 = $bookgenerator->create_chapter(['bookid' => $book->id]);
         $chapter2 = $bookgenerator->create_chapter(['bookid' => $book->id]);
